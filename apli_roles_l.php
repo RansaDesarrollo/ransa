@@ -41,7 +41,8 @@ if($op=='E')
 		
 }
 
-echo '<div data-ransa-server-response data-ransa-type="info" data-ransa-message="Asignación de usuario actualizada" data-ransa-reload="apli_roles.php" data-ransa-params="' . htmlspecialchars(json_encode(['rol' => (int) $cod_usuario]), ENT_QUOTES, 'UTF-8') . '"></div>';
+$refresh_sidebar = isset($_SESSION['id']) && (int) $_SESSION['id'] === (int) $cod_usuario ? ' data-ransa-refresh-sidebar="true"' : '';
+echo '<div data-ransa-server-response data-ransa-type="info" data-ransa-message="Asignación de usuario actualizada" data-ransa-reload="apli_roles.php" data-ransa-params="' . htmlspecialchars(json_encode(['rol' => (int) $cod_usuario]), ENT_QUOTES, 'UTF-8') . '"' . $refresh_sidebar . '></div>';
 
 
 ?>

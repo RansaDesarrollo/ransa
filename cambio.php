@@ -10,7 +10,7 @@ $email_usuario = $_SESSION["email"] ?? '';
   <div class="m-card__header d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
     <div>
       <h3 class="m-card__title fs-5 fw-bold mb-1" id="cambio-title">
-        <i class="fa-solid fa-key text-primary me-2"></i>Cambio de Contraseña
+        <i class="fa-solid fa-key text-primary ransa-brand-icon me-2" aria-hidden="true"></i>Cambio de Contraseña
       </h3>
       <p class="m-card__subtitle text-muted mb-0 small">Actualice su clave de acceso al sistema Ransa</p>
     </div>
@@ -28,7 +28,7 @@ $email_usuario = $_SESSION["email"] ?? '';
         <!-- ── Usuario activo banner ── -->
         <div class="card bg-light border-0 shadow-sm p-3 mb-4 rounded-3">
           <div class="d-flex align-items-center">
-            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 44px; height: 44px; font-weight: 700; font-size: 18px;">
+            <div class="bg-primary text-white ransa-brand-avatar rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 44px; height: 44px; font-weight: 700; font-size: 18px;">
               <?php echo strtoupper(substr($nombre_usuario, 0, 1)); ?>
             </div>
             <div class="overflow-hidden">

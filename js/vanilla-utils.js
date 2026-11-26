@@ -1,19 +1,19 @@
 /**
- * Vanilla JS Utility Functions
- * Replacement for common jQuery patterns used in CoolAdmin
+ * Ayudantes JavaScript sin dependencias.
+ * Reemplazan patrones de jQuery que usa la plantilla.
  */
 
-// DOM Selection
+// Búsqueda de elementos en el DOM
 const $ = (selector, context = document) => context.querySelector(selector);
 const $$ = (selector, context = document) => context.querySelectorAll(selector);
 
-// Class manipulation
+// Operaciones con clases CSS
 const addClass = (element, className) => element.classList.add(className);
 const removeClass = (element, className) => element.classList.remove(className);
 const toggleClass = (element, className) => element.classList.toggle(className);
 const hasClass = (element, className) => element.classList.contains(className);
 
-// Value getter / setter (jQuery compatibility helper)
+// Lee o actualiza el valor de un campo (compatibilidad con jQuery)
 const val = (element, value) => {
     if (typeof element === 'string') element = $(element);
     if (!element) return undefined;
@@ -34,7 +34,7 @@ if (typeof Element !== 'undefined' && !Element.prototype.val) {
     };
 }
 
-// Event handling
+// Registro y eliminación de eventos
 const on = (element, event, handler, options = false) => {
     if (typeof element === 'string') {
         element = $(element);
@@ -53,7 +53,7 @@ const off = (element, event, handler) => {
     }
 };
 
-// Animation utilities
+// Animaciones para mostrar, ocultar y desvanecer elementos
 const slideUp = (element, duration = 300) => {
     element.style.height = element.offsetHeight + 'px';
     element.style.transitionProperty = 'height, margin, padding';
@@ -151,7 +151,7 @@ const fadeToggle = (element, duration = 300) => {
     }
 };
 
-// DOM Ready
+// Ejecuta una función cuando el DOM está listo
 const ready = (callback) => {
     if (document.readyState !== 'loading') {
         callback();
@@ -160,7 +160,7 @@ const ready = (callback) => {
     }
 };
 
-// Utility functions
+// Ayudantes generales para elementos del DOM
 const hide = (element) => element.style.display = 'none';
 const show = (element) => element.style.removeProperty('display');
 
@@ -180,7 +180,7 @@ const findAll = (element, selector) => {
     return element.querySelectorAll(selector);
 };
 
-// Make functions globally available
+// Expone los ayudantes para que los scripts clásicos puedan usarlos.
 window.$ = $;
 window.$$ = $$;
 window.addClass = addClass;
@@ -204,7 +204,7 @@ window.find = find;
 window.findAll = findAll;
 window.val = val;
 
-// Export for module usage if needed
+// Permite reutilizar estos ayudantes desde pruebas o módulos CommonJS.
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         $, $$, addClass, removeClass, toggleClass, hasClass, val,

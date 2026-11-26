@@ -33,4 +33,3 @@ if (!$ok_conn || !$dbmy->_connectionID){
        echo "<br>Error de conexion a la base de datos: " . htmlspecialchars($dbmy->ErrorMsg()) . "<br>";
        exit;
 }
-?>

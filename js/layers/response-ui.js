@@ -30,6 +30,11 @@
     if (url && global.RansaConnection) {
       global.RansaConnection.loadFragment(url, readParams(response), 'contenedor');
     }
+
+    if (response.getAttribute('data-ransa-refresh-sidebar') === 'true' && global.RansaConnection) {
+      global.RansaConnection.loadFragment('contexto.php?fragment=sidebar', {}, 'sidebar-roles', { showLoading: false });
+      global.RansaConnection.loadFragment('contexto.php?fragment=sidebar&mode=mobile', {}, 'mobile-sidebar-roles', { showLoading: false });
+    }
   }
 
   document.addEventListener('ransa:fragment-loaded', (event) => {

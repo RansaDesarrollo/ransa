@@ -164,7 +164,7 @@ body.app .email-item__star {
 body.app .email-item__star:hover { color: var(--m-warning); }
 body.app .email-item__star i { font-size: 14px; }
 body.app .email-item__star.is-starred { color: var(--m-warning); }
-body.app .email-item__star.is-starred:hover { color: #d97706; }
+body.app .email-item__star.is-starred:hover { color: var(--m-c3); }
 
 body.app .email-item__avatar {
     width: 36px;

@@ -46,6 +46,8 @@
 @use 'app/notifications';
 @use 'app/inbox-pane';
 @use 'app/component-extras';
+@use 'app/ransa-workspace';
+@use 'app/colaboradores-dotacion';
 
 /* Ransa final workspace polish */
 body.app .workspace-layout {
@@ -133,7 +135,7 @@ body.app.login-splash .login-splash__image {
     height: auto;
     object-fit: contain;
 }
-body.app .ransa-open-submenu {
+body.app.ransa-workspace .menu-sidebar .navbar__list .ransa-open-submenu {
     display: block;
 }
 body.app .ransa-app-link {

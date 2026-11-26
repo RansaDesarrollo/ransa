@@ -1,8 +1,8 @@
 /**
- * CoolAdmin — Modern plugin behaviors (vanilla JS).
+ * CoolAdmin: interacciones modernas de la plantilla (JavaScript nativo).
  *
- * Animated counters, modern progress bars, and a lightweight image lightbox.
- * Styles live in css/theme.css; nothing is injected at runtime.
+ * Anima contadores y barras de progreso, y abre imágenes en una vista ampliada.
+ * Los estilos están en css/theme.css; no se agregan estilos desde JavaScript.
  */
 
 ready(() => {
@@ -11,8 +11,7 @@ ready(() => {
   initLightbox();
 });
 
-// `<span class="counter" data-count="42" data-duration="2000">0</span>`
-// Animates from 0 → data-count when the element scrolls into view.
+// Anima `.counter` desde cero hasta `data-count` cuando entra en pantalla.
 function initCounters() {
   const counters = $$('.counter');
   if (!counters.length) return;
@@ -48,8 +47,7 @@ function animateCounter(element, start, end, duration) {
   requestAnimationFrame(tick);
 }
 
-// `.progress-bar-modern` with `data-percentage` + `data-duration` and an
-// inner `.progress-fill` element. Animates width when scrolled into view.
+// Anima `.progress-fill` hasta `data-percentage` cuando la barra aparece.
 function initModernProgressBars() {
   const bars = $$('.progress-bar-modern');
   if (!bars.length) return;
@@ -84,8 +82,7 @@ function animateProgressBar(element, targetPercentage, duration) {
   requestAnimationFrame(tick);
 }
 
-// Click any `[data-lightbox]` element to open its `href` (or `data-src`)
-// image in a full-screen overlay.
+// Abre en una capa a pantalla completa la imagen indicada por href o data-src.
 function initLightbox() {
   $$('[data-lightbox]').forEach((trigger) => {
     on(trigger, 'click', function (e) {

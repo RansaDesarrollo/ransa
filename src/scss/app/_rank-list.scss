@@ -86,13 +86,13 @@ body.app .rank-list__bar::after {
     top: 0;
     bottom: 0;
     width: var(--rank-pct, 0%);
-    background: linear-gradient(90deg, var(--m-accent) 0%, #6c95e6 100%);
+    background: linear-gradient(90deg, var(--m-accent) 0%, var(--m-c3) 100%);
     border-radius: inherit;
     transition: width 360ms ease;
 }
 /* Top item gets a slightly stronger accent on the bar. */
 body.app .rank-list > li:nth-child(1) .rank-list__bar::after {
-    background: linear-gradient(90deg, var(--m-accent) 0%, #4272d7 100%);
+    background: linear-gradient(90deg, var(--m-accent) 0%, var(--m-c3) 100%);
 }
 
 

@@ -1,7 +1,7 @@
 {
   "name": "cooladmin",
   "version": "3.5.0",
-  "description": "CoolAdmin — Bootstrap 5.3 admin dashboard template. 35 pages, vanilla JavaScript, Chart.js, FullCalendar 7, Leaflet, six accent themes, command palette, and a Pug + SCSS + Vite source pipeline.",
+  "description": "CoolAdmin — Bootstrap 5.3 admin dashboard template. 35 pages, vanilla JavaScript, Chart.js, FullCalendar 7, Leaflet, RANSA green and orange themes, command palette, and a Pug + SCSS + Vite source pipeline.",
   "type": "module",
   "license": "MIT",
   "author": "Colorlib (https://colorlib.com)",
@@ -41,13 +41,15 @@
     "LICENSE.md"
   ],
   "scripts": {
-    "dev": "concurrently --kill-others -n pug,sass,vite -c blue,magenta,green \"npm:dev:pug\" \"npm:dev:sass\" \"npm:dev:vite\"",
+    "dev": "concurrently --kill-others -n pug,sass,tailwind,vite -c blue,magenta,yellow,green \"npm:dev:pug\" \"npm:dev:sass\" \"npm:dev:tailwind\" \"npm:dev:vite\"",
     "dev:pug": "node scripts/build-pug.js --watch",
     "dev:sass": "sass --watch src/scss/theme.scss:css/theme.css src/scss/app.scss:css/app.css --no-source-map --style=expanded",
+    "dev:tailwind": "tailwindcss -c tailwind.config.cjs -i src/tailwind.css -o css/tailwind.css --watch",
     "dev:vite": "vite",
-    "build": "npm run build:vendor && npm run build:pug && npm run build:sass",
+    "build": "npm run build:vendor && npm run build:pug && npm run build:sass && npm run build:tailwind",
     "build:pug": "node scripts/build-pug.js",
     "build:sass": "sass src/scss/theme.scss:css/theme.css src/scss/app.scss:css/app.css --no-source-map --style=expanded",
+    "build:tailwind": "tailwindcss -c tailwind.config.cjs -i src/tailwind.css -o css/tailwind.css",
     "build:vendor": "node scripts/build-vendor.js",
     "test": "node --test",
     "check": "npm run build && npm test"
@@ -58,6 +60,7 @@
     "fullcalendar": "^7.1.2",
     "pug": "^3.0.4",
     "sass": "^1.105.1",
+    "tailwindcss": "^3.4.17",
     "terser": "^5.51.2",
     "vite": "^8.3.4"
   },

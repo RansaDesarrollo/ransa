@@ -228,6 +228,83 @@
         }
         return false;
       }
+    },
+
+    /**
+     * URL de consulta/descarga para una firma almacenada (base DEMO)
+     */
+    getFirmaUrl(id) {
+      return `guardar_firma.php?id=${encodeURIComponent(id)}`;
+    },
+
+    /**
+     * Envía la firma en Base64 al backend PHP (base DEMO)
+     */
+    async saveFirma(firmaBase64) {
+      const respuesta = await fetch('guardar_firma.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firma: firmaBase64 })
+      });
+      const datos = await respuesta.json();
+      if (!respuesta.ok || !datos.ok) {
+        throw new Error(datos.mensaje || 'No se pudo guardar la firma.');
+      }
+      return datos;
+    },
+
+    /**
+     * Obtiene el listado de metadatos de firmas guardadas (base DEMO)
+     */
+    async listFirmas() {
+      const respuesta = await fetch('guardar_firma.php', {
+        cache: 'no-store',
+        credentials: 'same-origin'
+      });
+      const datos = await respuesta.json();
+      if (!respuesta.ok || !datos.ok || !Array.isArray(datos.firmas)) {
+        throw new Error(datos.mensaje || 'No se pudo cargar la lista.');
+      }
+      return datos;
+    },
+
+    /**
+     * Solicita el token CSRF de sesión para guardar colaborador y dotación
+     */
+    async getColaboradorToken() {
+      const response = await fetch('colaboradores_dotacion_guardar.php?accion=token', {
+        credentials: 'same-origin'
+      });
+      const result = await response.json();
+      if (!response.ok || !result.csrf_token) {
+        throw new Error(result.message || 'No se pudo iniciar una sesión segura.');
+      }
+      return result.csrf_token;
+    },
+
+    /**
+     * Envía el registro completo de colaborador, dotación y firma
+     */
+    async saveColaborador(payload, csrfToken) {
+      const response = await fetch('colaboradores_dotacion_guardar.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken
+        },
+        body: JSON.stringify(payload)
+      });
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        throw new Error('La sesión terminó o el servidor respondió en un formato inesperado. Inicia sesión y vuelve a intentarlo.');
+      }
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.message || 'No se pudo guardar el registro.');
+      }
+      return result;
     }
   };
 

@@ -54,7 +54,7 @@ body.app.auth-page .auth-brand-letter {
     color: #fff;
 }
 body.app.auth-page .auth-brand-title {
-    color: #173929;
+    color: var(--m-accent);
     margin: 0;
     font-size: 23px;
 }
@@ -130,8 +130,8 @@ body.app.auth-page .auth-brand .logo-mark {
     width: 36px;
     height: 36px;
     border-radius: 9px;
-    background: linear-gradient(135deg, #4272d7 0%, #3155b3 100%);
-    box-shadow: 0 4px 12px rgba(66, 114, 215, 0.35);
+    background: linear-gradient(135deg, var(--m-accent) 0%, var(--m-accent-hover) 100%);
+    box-shadow: 0 4px 12px rgba(var(--m-accent-rgb), 0.35);
     display: inline-flex;
     align-items: center;
     justify-content: center;

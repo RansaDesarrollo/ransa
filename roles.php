@@ -40,7 +40,7 @@ if ($cod != '') {
 
     <?php if ($cod != '' && $nombre_a != ''): ?>
     <!-- ── Indicador visual de rol seleccionado ── -->
-    <div class="alert alert-primary d-flex align-items-center justify-content-between py-2 px-3 mb-4 rounded-3 border-0 shadow-sm" style="background: #eaf0fc;" id="selected-role-alert">
+    <div class="alert alert-primary d-flex align-items-center justify-content-between py-2 px-3 mb-4 rounded-3 border-0 shadow-sm" style="background: #e7f5ec;" id="selected-role-alert">
       <div class="d-flex align-items-center">
         <span class="badge bg-primary me-2 px-2 py-1"><i class="fa-solid fa-check me-1"></i> Rol Seleccionado</span>
         <span class="text-dark">Está modificando el rol: <strong class="text-primary fs-6"><?php echo htmlspecialchars($nombre_a); ?></strong> <span class="text-muted small ms-1">(ID: <?php echo htmlspecialchars($id_a); ?>)</span></span>
@@ -65,7 +65,7 @@ if ($cod != '') {
     <!-- ── Action Buttons ── -->
     <div class="row mb-4">
       <div class="col-md-8 offset-md-2">
-        <div class="d-flex justify-content-center gap-2 flex-wrap">
+        <div class="tw-flex tw-flex-wrap tw-items-center tw-justify-center tw-gap-2">
         <?php if ($cod != ''): ?>
           <button type="button" name="bt2" id="bt2" title="De clic para Restablecer" onclick="restablecer();" class="btn btn-outline-secondary px-3">
             <i class="fa-solid fa-rotate-left me-1"></i> Restablecer

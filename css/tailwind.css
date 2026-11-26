@@ -1,0 +1,43 @@
+.tw-flex {
+  display: flex
+}
+
+.tw-grid {
+  display: grid
+}
+
+.tw-w-full {
+  width: 100%
+}
+
+.tw-min-w-0 {
+  min-width: 0px
+}
+
+.tw-grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr))
+}
+
+.tw-flex-wrap {
+  flex-wrap: wrap
+}
+
+.tw-items-center {
+  align-items: center
+}
+
+.tw-justify-end {
+  justify-content: flex-end
+}
+
+.tw-justify-center {
+  justify-content: center
+}
+
+.tw-gap-2 {
+  gap: 0.5rem
+}
+
+.tw-gap-4 {
+  gap: 1rem
+}

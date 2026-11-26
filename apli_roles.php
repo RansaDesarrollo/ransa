@@ -1,27 +1,22 @@
 <?php
 include ("conexion.php");
 
-$cod_usu='';
-$cod_usu=$_REQUEST['rol'];
+$cod_usu = isset($_REQUEST['rol']) ? (int) $_REQUEST['rol'] : 0;
 
 ?>
 
-<form name=form id=form action="" method="post" onsubmit="return false;">
-<div class="row">
-<div class ="col-md-12">
-<i><h3><?php ECHO htmlentities('ASOCIACIÓN USUARIOS A ROLES');?></h3></i>
-</div>
-</div>
-<div class="row">
-<div class="col-md-2"></div>
-<div class="col-md-3">
-<label><?php echo htmlentities('Seleccione del Usuario');?></label>
-	<input type=hidden name=op id=op>
-</div>
-<div class="col-md-5">
-	
-	<select name=rol id=rol required class="form-control">
-	<option value=''>-Seleccione-</option>
+<form name="form" id="form" class="ransa-association-form" action="" method="post" onsubmit="return false;">
+<input type="hidden" name="op" id="op">
+<section class="ransa-association" aria-labelledby="ransa-association-title">
+<header class="ransa-association__header">
+	<h2 class="ransa-association__title" id="ransa-association-title">Asociación de usuarios a roles</h2>
+</header>
+
+<div class="ransa-association__filters tw-grid tw-grid-cols-1 tw-gap-4">
+	<div class="ransa-association__field">
+		<label for="rol"><?php echo htmlentities('Seleccione el usuario');?></label>
+		<select name="rol" id="rol" required class="form-control">
+		<option value="">-Seleccione-</option>
 	<?php
 	$query="select * from usuarios where estado=1 order by nombre";
 	$equery=$dbmy->Execute($query);
@@ -52,37 +47,38 @@ $cod_usu=$_REQUEST['rol'];
 	?>
 	</select>
 	</div>
-<div class="col-md-2"></div>
-</div>
-<div class ="row">	
-<div  class="col-xs-12 col-md-12">
-<button type=submit name=bt1 id=bt1 value='Consultar' title='De clic para Consultar' onclick='consultar();' class="btn btn-primary color_botton1"><i class="fa fa-search"  aria-hidden="true" style="font-size: 18px;"></i> &nbsp; Consultar</button>
-</div>
+	<button type="submit" name="bt1" id="bt1" value="Consultar" title="Consultar roles del usuario" onclick="consultar();" class="btn btn-primary color_botton1">
+		<i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Consultar
+	</button>
 </div>
 
 
 <?php
-if($cod_usu!='')
+if ($cod_usu > 0)
 {
 ?>
-	<div class ="row">	
-	<div  class="col-xs-12 col-md-12">
-	<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Buscar por nombre.." class="form-control">
+	<div class="ransa-association__search">
+		<label class="visually-hidden" for="myInput">Buscar rol</label>
+		<input type="search" id="myInput" onkeyup="myFunction()" placeholder="Buscar rol…" class="form-control">
 	</div>
 
-	<div  class="col-xs-12 col-md-12">
-	<table  id="myTable" class="table-responsive" WIDTH=100% border=1 cellspacing=0 cellspading=0>
-		<tr class="header">
-			<th align=center >#</th>
-			<th align=center>NOMBRE DEL ROL</th>
-			<th align=center>OP</th>
-		</tr>	
+	<div class="table-responsive ransa-table-scroll">
+	<table id="myTable" class="table table-hover align-middle mb-0">
+		<thead>
+			<tr>
+				<th scope="col">#</th>
+				<th scope="col">Nombre del rol</th>
+				<th scope="col">Asignado</th>
+			</tr>
+		</thead>
+		<tbody>
 
 	<?php
 
 	$q1="select id,nombre from rol order by nombre ";
 	$eq1=$dbmy->Execute($q1);
 	$fq1=$eq1->RecordCount();
+	$j = 0;
 
 	for ($i=0;$i<$fq1;$i++){
 		
@@ -121,17 +117,19 @@ if($cod_usu!='')
 		$eq1->MoveNext();
 	}	
 	?>
-		<tr>
-			<th colspan=3><?php echo $j.' Registros existentes'?></th>
-		</tr>
-</table>
-</div>
-</div>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="3" class="text-end"><?php echo $j.' Registros existentes'?></td>
+			</tr>
+		</tfoot>
+	</table>
+	</div>
 <?php
 }
 ?>	
 	
-	
+</section>
 </form>
 
 

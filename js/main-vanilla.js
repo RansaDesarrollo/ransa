@@ -1,18 +1,18 @@
 /**
- * CoolAdmin — Page logic
- * Chart.js initializations + sidebar / dropdown / hamburger behaviors.
- * No jQuery. Helpers (`$`, `$$`, `on`, `addClass`, etc.) come from vanilla-utils.js.
+ * CoolAdmin — comportamiento de las páginas
+ * Inicializa gráficos Chart.js y controles del menú, panel lateral y tablas.
+ * No usa jQuery; los ayudantes DOM provienen de vanilla-utils.js.
  */
 
 // ---------------------------------------------------------------------------
-// Chart.js — shared option helpers
+// Chart.js: opciones reutilizadas por varios gráficos
 // ---------------------------------------------------------------------------
 
 const POPPINS = 'Poppins';
 const MONTHS_SHORT = ['January', 'February', 'March', 'April', 'May', 'June'];
 const MONTHS_LONG  = [...MONTHS_SHORT, 'July', 'August', 'September', 'October', 'November', 'December'];
 
-// Inline sparkline used in dashboard widgets — hidden axes, transparent grids.
+// Opciones compactas para minigráficos sin ejes visibles.
 function sparklineOptions({ tooltip = false } = {}) {
   const options = {
     maintainAspectRatio: false,
@@ -44,7 +44,7 @@ function sparklineOptions({ tooltip = false } = {}) {
   return options;
 }
 
-// Tooltip styling shared by the larger dashboard line charts.
+// Estilo común de las ayudas emergentes en gráficos grandes.
 const lightTooltip = {
   backgroundColor: '#fff',
   titleColor: '#333',
@@ -64,9 +64,8 @@ function percentTooltip() {
   };
 }
 
-// Simple guard to skip a chart when its canvas is absent on this page.
-// Also registers (id, render) into a private registry so the dashboard
-// "Refresh" button can re-run all relevant charts after a skeleton state.
+// Omite el gráfico si la página no tiene su canvas y guarda su inicializador.
+// El botón de actualizar usa ese registro para dibujar de nuevo los gráficos.
 const __chartRegistry = [];
 function withCanvas(id, render) {
   __chartRegistry.push({ id, render });
@@ -78,7 +77,7 @@ window.__coolReinit = function () {
   __chartRegistry.forEach(({ id, render }) => {
     const ctx = document.getElementById(id);
     if (!ctx) return;
-    // Destroy any pre-existing Chart.js instance bound to this canvas
+    // Destruye el gráfico anterior antes de reutilizar el canvas.
     if (window.Chart && typeof Chart.getChart === 'function') {
       const existing = Chart.getChart(ctx);
       if (existing) existing.destroy();
@@ -88,7 +87,7 @@ window.__coolReinit = function () {
 };
 
 // ---------------------------------------------------------------------------
-// Dashboard widget charts (index.html)
+// Gráficos de los widgets del dashboard principal (index.html)
 // ---------------------------------------------------------------------------
 
 withCanvas('widgetChart1', (ctx) => {
@@ -210,7 +209,7 @@ withCanvas('widgetChart5', (ctx) => {
 });
 
 // ---------------------------------------------------------------------------
-// Recent reports — dashboard variations
+// Gráficos de reportes recientes en las variantes del dashboard
 // ---------------------------------------------------------------------------
 
 withCanvas('recent-rep-chart', (ctx) => {
@@ -360,7 +359,7 @@ withCanvas('recent-rep3-chart', (ctx) => {
 });
 
 // ---------------------------------------------------------------------------
-// Doughnut "percent" charts
+// Gráficos circulares de porcentajes
 // ---------------------------------------------------------------------------
 
 withCanvas('percent-chart', (ctx) => {
@@ -421,12 +420,12 @@ withCanvas('percent-chart2', (ctx) => {
 });
 
 // ---------------------------------------------------------------------------
-// App-theme dashboard charts (index.html, body.app)
+// Gráficos del dashboard con el tema moderno (index.html, body.app)
 // ---------------------------------------------------------------------------
 
 const INTER = '"Inter", system-ui, sans-serif';
 
-// Tooltip styled for light cards on neutral backgrounds.
+// Ayudas emergentes para tarjetas claras y fondos neutros.
 const modernTooltip = {
   backgroundColor: '#0f172a',
   titleColor: '#f1f5f9',
@@ -439,9 +438,9 @@ const modernTooltip = {
   displayColors: false,
 };
 
-// Sparkline shared by the four KPI tiles. `accent` is the line + fill color.
+// Minigráfico compartido por los cuatro indicadores; `accent` define su color.
 function kpiSparkline(ctx, { accent, data, fillStops }) {
-  // Build a vertical gradient fill so the area fades to transparent.
+  // Aplica un degradado que se desvanece debajo de la línea.
   const canvasCtx = ctx.getContext('2d');
   const gradient = canvasCtx.createLinearGradient(0, 0, 0, 60);
   gradient.addColorStop(0, fillStops[0]);
@@ -482,9 +481,9 @@ function kpiSparkline(ctx, { accent, data, fillStops }) {
   });
 }
 
-// KPI tile palette — anchored to the original CoolAdmin gradient family.
+// Colores de los minigráficos de indicadores.
 withCanvas('kpi-revenue', (ctx) => kpiSparkline(ctx, {
-  accent: '#4272d7',                                                // c1 — blue
+  accent: '#009A3F',                                                // RANSA green
   fillStops: ['rgba(66, 114, 215, 0.22)', 'rgba(66, 114, 215, 0)'],
   data: [32, 36, 31, 40, 44, 41, 48, 46, 52, 49, 56, 60, 58, 64, 62, 68, 70, 65, 72, 75, 71, 78, 76, 82, 80, 86, 84, 90, 88, 95],
 }));
@@ -507,7 +506,7 @@ withCanvas('kpi-conversion', (ctx) => kpiSparkline(ctx, {
   data: [2.6, 2.7, 2.5, 2.8, 2.9, 2.7, 3.0, 2.9, 3.1, 3.0, 3.2, 3.1, 3.3, 3.2, 3.0, 3.1, 3.2, 3.3, 3.4, 3.2, 3.3, 3.5, 3.3, 3.4, 3.5, 3.4, 3.3, 3.2, 3.3, 3.24],
 }));
 
-// Primary line chart: revenue vs services for the last 30 days.
+// Gráfico principal: comparación de productos y servicios de los últimos 30 días.
 withCanvas('primary-chart', (ctx) => {
   const canvasCtx = ctx.getContext('2d');
   const productsFill = canvasCtx.createLinearGradient(0, 0, 0, 280);
@@ -530,14 +529,14 @@ withCanvas('primary-chart', (ctx) => {
         {
           label: 'Products',
           data: products,
-          borderColor: '#4272d7',
+          borderColor: '#009A3F',
           backgroundColor: productsFill,
           borderWidth: 2,
           fill: true,
           tension: 0.35,
           pointRadius: 0,
           pointHoverRadius: 5,
-          pointHoverBackgroundColor: '#4272d7',
+          pointHoverBackgroundColor: '#009A3F',
           pointHoverBorderColor: '#fff',
           pointHoverBorderWidth: 2,
         },
@@ -609,11 +608,11 @@ withCanvas('primary-chart', (ctx) => {
 });
 
 // ---------------------------------------------------------------------------
-// Mini sparklines for the card.html showcase
+// Minigráficos de ejemplo para card.html
 // ---------------------------------------------------------------------------
 
 withCanvas('card-spark-1', (ctx) => kpiSparkline(ctx, {
-  accent: '#4272d7',
+  accent: '#009A3F',
   fillStops: ['rgba(66, 114, 215, 0.22)', 'rgba(66, 114, 215, 0)'],
   data: [22, 28, 24, 32, 35, 30, 38, 42, 38, 46, 50, 48, 52, 56, 54, 60, 58, 62, 66, 70],
 }));
@@ -634,7 +633,7 @@ withCanvas('card-spark-4', (ctx) => kpiSparkline(ctx, {
 }));
 
 // ---------------------------------------------------------------------------
-// Sales pipeline (index2.html)
+// Etapas del proceso de ventas (index2.html)
 // ---------------------------------------------------------------------------
 
 withCanvas('pipeline-funnel', (ctx) => {
@@ -645,7 +644,7 @@ withCanvas('pipeline-funnel', (ctx) => {
       labels: ['Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed won'],
       datasets: [{
         data: [320, 180, 95, 55, 24],
-        backgroundColor: ['#bdcef2', '#a3bbe8', '#7c9dde', '#5b85d8', '#4272d7'],
+        backgroundColor: ['#C9EBD5', '#8FD2A9', '#58B980', '#279C55', '#009A3F'],
         borderRadius: 6,
         borderSkipped: false,
         barPercentage: 0.7,
@@ -680,7 +679,7 @@ withCanvas('pipeline-funnel', (ctx) => {
 });
 
 // ---------------------------------------------------------------------------
-// Marketing analytics (index3.html)
+// Métricas de marketing (index3.html)
 // ---------------------------------------------------------------------------
 
 withCanvas('traffic-trend', (ctx) => {
@@ -701,7 +700,7 @@ withCanvas('traffic-trend', (ctx) => {
     data: {
       labels,
       datasets: [
-        { label: 'Visitors', data: visitors, borderColor: '#4272d7', backgroundColor: fillA, borderWidth: 2, fill: true, tension: 0.35, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: '#4272d7', pointHoverBorderColor: '#fff', pointHoverBorderWidth: 2 },
+        { label: 'Visitors', data: visitors, borderColor: '#009A3F', backgroundColor: fillA, borderWidth: 2, fill: true, tension: 0.35, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: '#009A3F', pointHoverBorderColor: '#fff', pointHoverBorderWidth: 2 },
         { label: 'Sessions', data: sessions, borderColor: '#11998e', backgroundColor: fillB, borderWidth: 2, fill: true, tension: 0.35, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: '#11998e', pointHoverBorderColor: '#fff', pointHoverBorderWidth: 2 },
       ],
     },
@@ -733,7 +732,7 @@ withCanvas('traffic-sources', (ctx) => {
       labels: ['Organic search', 'Direct', 'Social', 'Referral', 'Email'],
       datasets: [{
         data: [42, 26, 14, 10, 8],
-        backgroundColor: ['#4272d7', '#11998e', '#f97316', '#ec4899', '#8b5cf6'],
+        backgroundColor: ['#009A3F', '#F39200', '#087A38', '#C77800', '#58B980'],
         hoverBackgroundColor: ['#3155b3', '#0d8780', '#e0660a', '#d23a87', '#7c4ce6'],
         borderWidth: 2,
         hoverBorderColor: '#ffffff',
@@ -755,7 +754,7 @@ withCanvas('traffic-sources', (ctx) => {
 });
 
 // ---------------------------------------------------------------------------
-// UI behaviors — sidebar, dropdowns, hamburger menu, tables
+// Interacciones: menú lateral, listas, botones y tablas
 // ---------------------------------------------------------------------------
 
 ready(() => {
@@ -774,9 +773,9 @@ ready(() => {
 });
 
 // ---------------------------------------------------------------------------
-// Dashboard refresh — demonstrates a real skeleton-loading state
-// Triggered by any [data-refresh-dashboard] or #dash-refresh-btn button.
-// Targets every .stat-card (kpi strip) and the primary chart card.
+// Actualiza el dashboard mostrando esqueletos de carga temporalmente.
+// Se activa con [data-refresh-dashboard] o con el botón #dash-refresh-btn.
+// Al terminar, restaura las tarjetas y vuelve a dibujar los gráficos.
 // ---------------------------------------------------------------------------
 function initDashboardRefresh() {
   const btn = document.getElementById('dash-refresh-btn');
@@ -786,7 +785,7 @@ function initDashboardRefresh() {
   const primaryChartCard = document.querySelector('.primary-chart-card, [data-skeletonize]');
   if (!statCards.length) return;
 
-  // Snapshot original markup so we can restore it
+  // Guarda el contenido original para restaurarlo al terminar.
   const snapshots = statCards.map(c => c.innerHTML);
   const primarySnap = primaryChartCard ? primaryChartCard.innerHTML : null;
 
@@ -815,13 +814,12 @@ function initDashboardRefresh() {
     btn.innerHTML = '<span class="btn-spinner" aria-hidden="true"></span> Refreshing…';
     btn.disabled = true;
 
-    // Lock card heights so the skeletons occupy the same vertical space as
-    // the real content — prevents jarring layout shifts.
+    // Conserva la altura de las tarjetas para evitar saltos en la página.
     const lockedHeights = statCards.map(c => c.getBoundingClientRect().height);
     const primaryHeight = primaryChartCard ? primaryChartCard.getBoundingClientRect().height : null;
 
-    // Release chart observers/listeners before replacing their canvases.
-    // A detached canvas cannot be found by __coolReinit after the refresh.
+    // Desconecta los gráficos antes de reemplazar sus canvas.
+    // El registro no puede encontrarlos si el canvas ya fue retirado del DOM.
     if (window.Chart) {
       new Set([...statCards, primaryChartCard].filter(Boolean)).forEach((card) => {
         card.querySelectorAll('canvas').forEach((canvas) => {
@@ -850,7 +848,7 @@ function initDashboardRefresh() {
         primaryChartCard.style.minHeight = '';
       }
 
-      // Re-run all withCanvas registrations so charts redraw against the fresh DOM
+      // Vuelve a dibujar los gráficos usando los canvas nuevos.
       if (window.__coolReinit) window.__coolReinit();
 
       btn.innerHTML = originalLabel;
@@ -862,40 +860,36 @@ function initDashboardRefresh() {
 }
 
 // ---------------------------------------------------------------------------
-// Theme switcher — 6 accent-color presets, persisted in localStorage
+// Selector de colores corporativos; recuerda la elección en localStorage.
 // ---------------------------------------------------------------------------
 function initThemeSwitcher() {
   const body = document.body;
   if (!body.classList.contains('app')) return;
-  // Skip on auth/error full-screen pages where the switcher would crowd
+  // No muestra el selector en páginas de login o error a pantalla completa.
   if (body.classList.contains('auth-page') || body.classList.contains('error-page')) return;
 
   const THEMES = [
-    { id: 'blue',     label: 'Blue',     color: '#4272d7' },
-    { id: 'purple',   label: 'Purple',   color: '#7c3aed' },
-    { id: 'teal',     label: 'Teal',     color: '#0d9488' },
-    { id: 'rose',     label: 'Rose',     color: '#e11d48' },
-    { id: 'amber',    label: 'Amber',    color: '#d97706' },
-    { id: 'graphite', label: 'Graphite', color: '#334155' },
+    { id: 'ransa-green', label: 'Verde Ransa', color: '#009A3F' },
+    { id: 'ransa-orange', label: 'Naranja Ransa', color: '#F39200' },
   ];
   const STORAGE_KEY = 'cooladmin.theme';
 
-  // Apply persisted choice (or default to blue)
+  // Restaura el color elegido o usa el verde Ransa predeterminado.
   const saved = (function () {
     try { return localStorage.getItem(STORAGE_KEY); } catch (_) { return null; }
   })();
   let active = THEMES.find((t) => t.id === saved) || THEMES[0];
   applyTheme(active.id);
 
-  // Build the floating widget
+  // Crea el botón flotante para cambiar de tema.
   const wrap = document.createElement('div');
   wrap.className = 'theme-switcher';
   wrap.innerHTML = `
-    <div class="theme-switcher__panel" role="dialog" aria-label="Theme picker">
-      <p class="theme-switcher__title">Accent color</p>
+    <div class="theme-switcher__panel" role="dialog" aria-label="Colores corporativos">
+      <p class="theme-switcher__title">Colores corporativos</p>
       <div class="theme-switcher__grid"></div>
     </div>
-    <button class="theme-switcher__toggle" type="button" aria-label="Change theme color" aria-expanded="false">
+    <button class="theme-switcher__toggle" type="button" aria-label="Cambiar color corporativo" aria-expanded="false">
       <i class="fa-solid fa-palette" aria-hidden="true"></i>
     </button>
   `;
@@ -908,7 +902,7 @@ function initThemeSwitcher() {
     btn.type = 'button';
     btn.dataset.theme = t.id;
     if (t.id === active.id) btn.classList.add('is-active');
-    btn.setAttribute('aria-label', `Use ${t.label} theme`);
+    btn.setAttribute('aria-label', `Usar el color ${t.label}`);
     btn.innerHTML = `
       <span class="theme-switcher__swatch-color" style="background:${t.color};"></span>
       <span class="theme-switcher__swatch-label">${t.label}</span>
@@ -918,7 +912,7 @@ function initThemeSwitcher() {
       applyTheme(t.id);
       try { localStorage.setItem(STORAGE_KEY, t.id); } catch (_) {}
       grid.querySelectorAll('.theme-switcher__swatch').forEach((b) => b.classList.toggle('is-active', b.dataset.theme === t.id));
-      if (window.toast) window.toast.success(`Switched to ${t.label}`);
+      if (window.toast) window.toast.success(`Color ${t.label} activado`);
     });
     grid.appendChild(btn);
   });
@@ -949,12 +943,9 @@ function initThemeSwitcher() {
 }
 
 // ---------------------------------------------------------------------------
-// Toast notification system
-// Public API: window.toast.show({title, message, type, duration})
-//             window.toast.success(message[, title])
-//             window.toast.info(message[, title])
-//             window.toast.warning(message[, title])
-//             window.toast.error(message[, title])
+// Notificaciones emergentes disponibles como window.toast.
+// Permite show({title, message, type, duration}) y los métodos success,
+// info, warning y error, que reciben el mensaje y opcionalmente el título.
 // ---------------------------------------------------------------------------
 function initToastSystem() {
   let container = document.querySelector('.toast-container');
@@ -1014,9 +1005,8 @@ function initToastSystem() {
 }
 
 // ---------------------------------------------------------------------------
-// Command palette (Cmd+K / Ctrl+K)
-// Static list of pages + a few example actions; arrow-key navigation; Enter
-// activates; Escape or backdrop click dismisses.
+// Buscador de comandos: abre con Cmd+K o Ctrl+K, navega con flechas,
+// ejecuta con Enter y se cierra con Escape o al pulsar fuera.
 // ---------------------------------------------------------------------------
 function initCommandPalette() {
   const COMMANDS = [
@@ -1053,21 +1043,37 @@ function initCommandPalette() {
   ];
 
   function getCommands() {
+    const roleCommands = [];
     const appCommands = [];
-    const seenUrls = new Set();
-    document.querySelectorAll('[data-app-url]').forEach((link) => {
-      const url = link.getAttribute('data-app-url');
-      if (!url || seenUrls.has(url)) return;
-      seenUrls.add(url);
-      appCommands.push({
-        section: 'Aplicaciones',
-        title: (link.textContent || '').trim(),
-        sub: 'Abrir aplicación',
-        fragment: url,
-        icon: 'fa-layer-group'
+    document.querySelectorAll('.menu-sidebar .navbar__list > li').forEach((item) => {
+      const roleLink = item.querySelector('.js-arrow');
+      if (!roleLink) return;
+
+      const roleName = (roleLink.textContent || '').trim();
+      roleCommands.push({
+        section: 'Módulos',
+        title: roleName,
+        sub: 'Ver módulo y sus aplicaciones',
+        icon: 'fa-folder-open',
+        action: () => {
+          if (!roleLink.classList.contains('open')) roleLink.click();
+          roleLink.scrollIntoView({ block: 'nearest' });
+        }
+      });
+
+      item.querySelectorAll('.navbar__sub-list [data-app-url]').forEach((link) => {
+        const url = link.getAttribute('data-app-url');
+        if (!url) return;
+        appCommands.push({
+          section: 'Aplicaciones',
+          title: (link.textContent || '').trim(),
+          sub: `Módulo: ${roleName}`,
+          fragment: url,
+          icon: 'fa-layer-group'
+        });
       });
     });
-    return [...COMMANDS, ...appCommands];
+    return [...COMMANDS, ...roleCommands, ...appCommands];
   }
 
   let overlay, input, results, activeIndex = 0, currentList = [];
@@ -1081,7 +1087,7 @@ function initCommandPalette() {
       <div class="cmdk-panel">
         <div class="cmdk-input-wrap">
           <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-          <input class="cmdk-input" type="text" placeholder="Search pages, actions…" aria-label="Search">
+          <input class="cmdk-input" type="text" placeholder="Buscar roles, módulos o acciones…" aria-label="Buscar">
           <kbd class="cmdk-hint">esc</kbd>
         </div>
         <ul class="cmdk-results" role="listbox"></ul>
@@ -1108,7 +1114,7 @@ function initCommandPalette() {
     currentList = filtered;
     activeIndex = 0;
     if (!filtered.length) {
-      results.innerHTML = '<li class="cmdk-empty">No results.</li>';
+      results.innerHTML = '<li class="cmdk-empty">No se encontraron resultados.</li>';
       return;
     }
     const groups = new Map();
@@ -1199,7 +1205,7 @@ function initCommandPalette() {
     }
   });
 
-  // Wire the topbar search field — focusing it opens the palette instead
+  // Al enfocar la búsqueda de la barra superior, abre el buscador de comandos.
   const topbarSearch = document.querySelector('.form-header .au-input');
   if (topbarSearch) {
     topbarSearch.addEventListener('focus', (e) => {
@@ -1213,14 +1219,13 @@ function initCommandPalette() {
   }
 }
 
-// Floating sidebar tooltip — only shown when the sidebar is collapsed on
-// desktop. Rendered as a single shared `<div>` appended to <body>, so it
-// escapes the sidebar's `overflow-y: auto` scroll clipping.
+// Muestra el nombre de cada opción cuando el menú está contraído en escritorio.
+// El mensaje se agrega al body para que no quede recortado por el menú.
 function initSidebarTooltips() {
   const links = $$('.menu-sidebar .navbar__list > li > a');
   if (!links.length) return;
 
-  // Cache labels from each link's visible text (after the <i> icon).
+  // Guarda el texto visible de cada enlace, sin incluir el icono.
   links.forEach((link) => {
     if (link.dataset.label) return;
     const label = (link.textContent || '').trim().replace(/\s+/g, ' ');
@@ -1262,13 +1267,12 @@ function initSidebarTooltips() {
     on(link, 'blur',       hide);
   });
 
-  // Hide whenever we leave the collapsed-desktop state.
+  // Oculta la ayuda si el menú deja de estar contraído en escritorio.
   on(window, 'resize', hide);
 }
 
-// Unified sidebar toggle: collapses the sidebar to an icon rail on desktop,
-// slides it in over a backdrop on mobile. Wires every `.js-sidebar-toggle`
-// element (topbar hamburger + the close button inside the sidebar header).
+// En escritorio reduce el menú a iconos; en móvil lo abre sobre un fondo.
+// Conecta los botones `.js-sidebar-toggle` de la barra y del menú.
 function initSidebarToggle() {
   const toggles = $$('.js-sidebar-toggle');
   if (!toggles.length) return;
@@ -1306,9 +1310,8 @@ function initSidebarToggle() {
   }
   function toggleDesktop() {
     toggleClass(body, 'sidebar-collapsed');
-    // When collapsing, strip any expanded sub-list state so the next
-    // un-collapse doesn't show stale `slideToggle`-applied inline styles
-    // or a rotated chevron with no visible labels next to it.
+    // Al contraer, cierra las sublistas para no restaurar estilos antiguos
+    // ni mostrar flechas abiertas sin sus etiquetas visibles.
     if (hasClass(body, 'sidebar-collapsed')) {
       $$('.menu-sidebar .js-arrow.open').forEach((a) => removeClass(a, 'open'));
       $$('.menu-sidebar .navbar__sub-list').forEach((sl) => {
@@ -1331,19 +1334,19 @@ function initSidebarToggle() {
     });
   });
 
-  // Close mobile sidebar on Escape.
+  // Escape cierra el menú móvil.
   on(document, 'keydown', (e) => {
     if (e.key === 'Escape' && hasClass(body, 'sidebar-open')) closeMobile();
   });
 
-  // Tapping a nav link on mobile should close the drawer.
+  // En móvil, navegar también cierra el menú.
   $$('.menu-sidebar .navbar__list a, .menu-sidebar .navbar__sub-list a').forEach((link) => {
     on(link, 'click', () => {
       if (isMobile()) closeMobile();
     });
   });
 
-  // Crossing the breakpoint clears the mobile-only state.
+  // Al cambiar entre móvil y escritorio, limpia el estado exclusivo de móvil.
   let resizeTimer;
   on(window, 'resize', () => {
     clearTimeout(resizeTimer);
@@ -1353,7 +1356,7 @@ function initSidebarToggle() {
   });
 }
 
-// Animate `.js-progressbar-simple` widths when scrolled into view.
+// Anima las barras `.js-progressbar-simple` al entrar en pantalla.
 function initProgressBars() {
   const bars = $$('.js-progressbar-simple');
   if (!bars.length) return;
@@ -1380,7 +1383,7 @@ function initProgressBars() {
   bars.forEach((bar) => observer.observe(bar));
 }
 
-// Topbar notification + account dropdowns (`.js-item-menu`).
+// Menús desplegables de notificaciones y cuenta (`.js-item-menu`).
 function initTopbarDropdowns() {
   const menu = $$('.js-item-menu');
   if (!menu.length) return;
@@ -1388,33 +1391,51 @@ function initTopbarDropdowns() {
   let openIndex = -1;
 
   menu.forEach((item, index) => {
+    on(item, 'keydown', (e) => {
+      if (e.target !== item || (e.key !== 'Enter' && e.key !== ' ')) return;
+      e.preventDefault();
+      item.click();
+    });
+
     on(item, 'click', (e) => {
+      if (e.target.closest('.js-account-app-link')) return;
       e.preventDefault();
       const rightSidebar = $('.js-right-sidebar');
       if (rightSidebar) removeClass(rightSidebar, 'show-sidebar');
 
       if (index === openIndex) {
-        toggleClass(item, 'show-dropdown');
+        removeClass(item, 'show-dropdown');
+        item.setAttribute('aria-expanded', 'false');
         openIndex = -1;
       } else {
-        menu.forEach((m) => removeClass(m, 'show-dropdown'));
-        toggleClass(item, 'show-dropdown');
+        menu.forEach((m) => {
+          removeClass(m, 'show-dropdown');
+          m.setAttribute('aria-expanded', 'false');
+        });
+        addClass(item, 'show-dropdown');
+        item.setAttribute('aria-expanded', 'true');
         openIndex = index;
       }
     });
   });
 
   on(document.body, 'click', () => {
-    menu.forEach((m) => removeClass(m, 'show-dropdown'));
+    menu.forEach((m) => {
+      removeClass(m, 'show-dropdown');
+      m.setAttribute('aria-expanded', 'false');
+    });
     openIndex = -1;
   });
 
   $$('.js-item-menu, .js-dropdown').forEach((el) => {
-    on(el, 'click', (e) => e.stopPropagation());
+    on(el, 'click', (e) => {
+      if (e.target.closest('.js-account-app-link')) return;
+      e.stopPropagation();
+    });
   });
 }
 
-// Right-side settings panel toggle.
+// Abre y cierra el panel lateral de ajustes.
 function initRightSidebar() {
   const rightSidebar = $('.js-right-sidebar');
   const sidebarBtn = $('.js-sidebar-btn');
@@ -1435,21 +1456,22 @@ function initRightSidebar() {
   });
 }
 
-// Expand/collapse arrows in nav sub-lists.
+// Flechas para desplegar o contraer sublistas de navegación.
 function initSubListArrows() {
-  $$('.js-arrow').forEach((arrow) => {
-    on(arrow, 'click', function (e) {
-      e.preventDefault();
-      const arrowIcon = find(this, '.arrow');
-      const subList = find(this.parentNode, '.js-sub-list');
-      if (arrowIcon) toggleClass(arrowIcon, 'up');
-      toggleClass(this, 'open');
-      if (subList) slideToggle(subList, 250);
-    });
+  on(document, 'click', (e) => {
+    const arrow = e.target.closest('.js-arrow');
+    if (!arrow) return;
+
+    e.preventDefault();
+    const arrowIcon = find(arrow, '.arrow');
+    const subList = find(arrow.parentNode, '.js-sub-list');
+    if (arrowIcon) toggleClass(arrowIcon, 'up');
+    toggleClass(arrow, 'open');
+    if (subList) slideToggle(subList, 250);
   });
 }
 
-// Mobile hamburger toggle.
+// Control del botón de menú móvil.
 function initHamburgerMenu() {
   const hamburger = $('.hamburger');
   const mobileMenu = $('.navbar-mobile');
@@ -1461,7 +1483,7 @@ function initHamburgerMenu() {
   });
 }
 
-// Add visual scroll affordance to overflowing `.table-responsive` containers.
+// Indica visualmente cuándo una tabla desplazable tiene contenido fuera de vista.
 function initResponsiveTableShadows() {
   const containers = $$('.table-responsive');
   if (!containers.length) return;

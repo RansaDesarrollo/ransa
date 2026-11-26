@@ -1,9 +1,8 @@
 /**
- * Bootstrap 5 initialization for components that don't auto-init.
+ * Inicialización de componentes de Bootstrap 5 que no se activan solos.
  *
- * Modals, dropdowns, tabs, collapses, alerts, and carousels self-instantiate
- * via `data-bs-toggle` / `data-bs-ride` — explicit `new bootstrap.X()` is only
- * needed for tooltips and popovers (which are opt-in for performance).
+ * Modales, menús, pestañas, paneles, alertas y carruseles se activan con sus
+ * atributos data-bs. Los tooltips y popovers requieren inicialización explícita.
  */
 
 ready(() => {

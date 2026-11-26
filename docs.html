@@ -315,17 +315,14 @@
 
                                 <section class="docs-section" id="install">
                                     <h2>Quick start <a class="anchor" href="#install" aria-label="Link"><i class="fa-solid fa-link"></i></a></h2>
-                                    <p>CoolAdmin is a static HTML template &mdash; no build step, no toolchain. Open any <code>.html</code> file via a local server and you&rsquo;re running.</p>
+                                    <p>The built HTML pages are static and can run without Node. This repository also includes Pug and SCSS source files; use the commands below when changing the pages or styles.</p>
                                     <pre><button class="docs-copy-btn" type="button">Copy</button><code># Clone or download the template
 git clone https://github.com/puikinsh/CoolAdmin.git
 cd CoolAdmin
 
-# Serve locally (Python 3 example)
-python3 -m http.server 8000
-
-# Or with Node
-npx serve .</code></pre>
-                                    <p>Then visit <code>http://localhost:8000/index.html</code>. CSS is shipped pre-built &mdash; no Sass watcher to run.</p>
+npm ci
+npm run dev</code></pre>
+                                    <p>Open <code>http://localhost:3000</code>. The development command watches the Pug and SCSS sources and serves the generated pages.</p>
 
                                     <blockquote>
                                         <strong>Important</strong>
@@ -335,13 +332,13 @@ npx serve .</code></pre>
 
                                 <section class="docs-section" id="workflow">
                                     <h2>Contributor workflow</h2>
-                                    <p>Use Node &ge;22.12 to edit the Pug and SCSS sources. Built pages still run without Node.</p>
+                                    <p>Use Node &ge;22.12 to edit the Pug and SCSS sources. The HTML pages in the project root are generated from <code>src/pug/pages/</code>; make changes in the source files, not in generated output.</p>
                                     <pre><button class="docs-copy-btn" type="button">Copy</button><code>npm ci
 npm run dev       # Pug + Sass watchers, Vite at localhost:3000
 npm run build     # minified calendar assets + HTML + CSS
 npm test          # six Node regression tests
 npm run check     # build and tests</code></pre>
-                                    <p>Edit <code>src/pug/pages/</code>, shared templates in <code>src/pug/partials/</code>, and styles in <code>src/scss/</code>. Commit generated HTML/CSS with the source changes. Pug saves are debounced; unchanged pages are not rewritten.</p>
+                                    <p>Edit <code>src/pug/pages/</code>, shared templates in <code>src/pug/partials/</code>, and styles in <code>src/scss/</code>. The 35 root HTML files are generated routes linked from the menu; content fragments in <code>src/pug/partials/content/</code> are not separate pages. Commit generated HTML/CSS with their source changes. Pug saves are debounced; unchanged pages are not rewritten.</p>
                                     <p>v3.5.0 uses Vite 8.3.4, Sass 1.105.1, concurrently 10.0.6, Pug 3.0.4, Chokidar 5.0.0, and Terser 5.51.2. FullCalendar 7.1.2 runs on the calendar page; Chart.js 4.5.1 loads only on the five pages with chart canvases.</p>
                                     <p>The calendar scripts shrink from 803 KB to 341 KB raw (165 KB to 96 KB gzip). Removing Chart.js avoids a 208 KB script request on 23 pages. Dashboard refresh releases old chart instances before replacing canvases. These are asset-size measurements, not page-speed scores.</p>
                                     <p>CI checks Node 22/24, local assets, chart loading, calendar versions, Pug builds/watchers, chart cleanup, and generated output consistency. See <a href="https://cooladmin.colorlib.com/docs/testing-workflow/">the testing guide</a> and <a href="https://cooladmin.colorlib.com/docs/changelog/">release notes</a>.</p>
@@ -384,16 +381,10 @@ npm run check     # build and tests</code></pre>
 
                                 <section class="docs-section" id="themes">
                                     <h2>Color themes <a class="anchor" href="#themes" aria-label="Link"><i class="fa-solid fa-link"></i></a></h2>
-                                    <p>Six accent-color presets ship out of the box. Use the floating palette button (bottom-right of any page) to try them, or set the body class directly:</p>
-                                    <pre><code>&lt;body class=&quot;app theme-purple&quot;&gt;</code></pre>
-                                    <p>Available themes: <code>theme-blue</code> (default), <code>theme-purple</code>, <code>theme-teal</code>, <code>theme-rose</code>, <code>theme-amber</code>, <code>theme-graphite</code>.</p>
-                                    <p>To define your own theme, override the four accent variables on <code>body.app.theme-yourname</code>:</p>
-                                    <pre><code>body.app.theme-mycolor {
-    --m-accent:        #ff5722;
-    --m-accent-rgb:    255, 87, 34;
-    --m-accent-hover:  #e64a19;
-    --m-accent-soft:   #fff3e0;
-}</code></pre>
+                                    <p>Choose either RANSA corporate color from the floating palette, or set the body class directly:</p>
+                                    <pre><code>&lt;body class=&quot;app theme-ransa-orange&quot;&gt;</code></pre>
+                                    <p>Available themes: <code>theme-ransa-green</code> (default) and <code>theme-ransa-orange</code>.</p>
+                                    <p>Use the official green and orange values to preserve the RANSA visual identity: <code>#009A3F</code> and <code>#F39200</code>.</p>
                                     <p>The user&rsquo;s choice is persisted automatically in <code>localStorage</code> under the key <code>cooladmin.theme</code>.</p>
                                 </section>
 
@@ -467,10 +458,9 @@ window.cmdk.close();</code></pre>
   href: 'my-page.html', icon: 'fa-bolt' }</code></pre>
 
                                     <h3>Theme switcher</h3>
-                                    <p>The floating palette button auto-injects on every page. The user&rsquo;s choice is persisted in <code>localStorage</code>. To force a theme programmatically, just toggle the body class:</p>
-                                    <pre><code>document.body.classList.remove('theme-blue', 'theme-purple', 'theme-teal',
-                                'theme-rose', 'theme-amber', 'theme-graphite');
-document.body.classList.add('theme-purple');</code></pre>
+                                    <p>The floating palette offers only RANSA corporate colors and persists the selection in <code>localStorage</code>. To force a theme programmatically, toggle the body class:</p>
+                                    <pre><code>document.body.classList.remove('theme-ransa-green', 'theme-ransa-orange');
+document.body.classList.add('theme-ransa-green');</code></pre>
                                 </section>
 
                                 <section class="docs-section" id="charts">

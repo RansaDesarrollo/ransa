@@ -218,6 +218,64 @@
     },
 
     /**
+     * Serializa las tallas seleccionadas en formato JSON (o cadena vacía si no hay selección)
+     */
+    serializeSelectedSizes(values = []) {
+      const cleaned = Array.isArray(values) ? values.map((v) => String(v || '').trim()).filter(Boolean) : [];
+      return cleaned.length ? JSON.stringify(cleaned) : '';
+    },
+
+    /**
+     * Valida los datos mínimos de colaborador y firma de entrega
+     * @param {Object} data - { cedula, nombre, edad, tieneFirma, firmaId }
+     * @returns {{ isValid: boolean, errors: string[] }}
+     */
+    validateColaboradorDotacion(data = {}) {
+      const errors = [];
+      const cedula = typeof data.cedula === 'string' ? data.cedula.trim() : '';
+      const nombre = typeof data.nombre === 'string' ? data.nombre.trim() : '';
+      const edadRaw = data.edad !== undefined && data.edad !== null ? String(data.edad).trim() : '';
+      const tieneFirma = Boolean(data.tieneFirma) || Number(data.firmaId) > 0;
+
+      if (!cedula) {
+        errors.push('La cédula del colaborador es obligatoria.');
+      }
+      if (!nombre) {
+        errors.push('El nombre del colaborador es obligatorio.');
+      }
+      if (edadRaw !== '') {
+        const edad = Number(edadRaw);
+        if (!Number.isInteger(edad) || edad < 0 || edad > 120) {
+          errors.push('La edad debe ser un número entre 0 y 120.');
+        }
+      }
+      if (!tieneFirma) {
+        errors.push('Dibuja o guarda la firma del colaborador antes de registrar la entrega.');
+      }
+
+      return {
+        isValid: errors.length === 0,
+        errors
+      };
+    },
+
+    /**
+     * Construye el payload limpio para guardar colaborador, dotación y firma
+     */
+    buildColaboradorPayload(entries = {}, tipoEquipoTi = [], tipoDotacionLey = [], firmaData = '', firmaId = null) {
+      const payload = { ...entries };
+      payload.tipo_equipo_ti = Array.isArray(tipoEquipoTi) ? tipoEquipoTi : [];
+      payload.tipo_dotacion_ley = Array.isArray(tipoDotacionLey) ? tipoDotacionLey : [];
+      if (firmaId && Number(firmaId) > 0) {
+        payload.firma_id = Number(firmaId);
+      }
+      if (firmaData) {
+        payload.firma = firmaData;
+      }
+      return payload;
+    },
+
+    /**
      * Filtra filas de una tabla basado en una lista de registros y un criterio de búsqueda
      */
     filterRecords(records, query, fieldExtractor) {

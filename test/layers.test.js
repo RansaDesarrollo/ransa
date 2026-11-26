@@ -134,6 +134,39 @@ test('CAPA DE LÓGICA: RansaLogic validaciones y normalización de datos', () =>
 
   const userRolePayload = RansaLogic.buildUserRolePayload('e', '3', '15');
   assert.deepEqual({ ...userRolePayload }, { op: 'E', cod_rol: 3, cod_usuario: 15 });
+
+  // 6. Validación de Colaboradores, Dotación y Firma
+  assert.equal(RansaLogic.serializeSelectedSizes(['M', '', '32']), '["M","32"]');
+  assert.equal(RansaLogic.serializeSelectedSizes(['', '']), '');
+
+  const colabInvalid = RansaLogic.validateColaboradorDotacion({
+    cedula: '',
+    nombre: 'Ana',
+    edad: '150',
+    tieneFirma: false,
+    firmaId: null
+  });
+  assert.equal(colabInvalid.isValid, false);
+  assert.equal(colabInvalid.errors.length, 3);
+
+  const colabValid = RansaLogic.validateColaboradorDotacion({
+    cedula: '10012345',
+    nombre: 'Ana Gómez',
+    edad: '29',
+    tieneFirma: true,
+    firmaId: 4
+  });
+  assert.equal(colabValid.isValid, true);
+  assert.deepEqual(
+    { ...RansaLogic.buildColaboradorPayload({ cedula: '10012345' }, ['Laptop'], ['BOTAS'], 'data:image/png;base64,abc', '4') },
+    {
+      cedula: '10012345',
+      tipo_equipo_ti: ['Laptop'],
+      tipo_dotacion_ley: ['BOTAS'],
+      firma_id: 4,
+      firma: 'data:image/png;base64,abc'
+    }
+  );
 });
 
 test('CAPA DE CONEXIÓN: RansaConnection peticiones y carga de fragmentos', async () => {
@@ -189,6 +222,29 @@ test('CAPA DE CONEXIÓN: RansaConnection peticiones y carga de fragmentos', asyn
   assert.equal(bridgeSuccess, true);
   assert.equal(requestedUrl, 'roles_l.php');
   assert.equal(requestedBody.get('nombre'), 'Nuevo');
+
+  // Test capa de conexión de firmas (base DEMO)
+  assert.equal(RansaConnection.getFirmaUrl(7), 'guardar_firma.php?id=7');
+
+  const firmaCtx = createSandboxContext({
+    fetch: async (url, options = {}) => {
+      requestedUrl = url;
+      requestedMethod = options.method || 'GET';
+      requestedBody = options.body;
+      if (requestedMethod === 'POST') {
+        return { ok: true, status: 201, json: async () => ({ ok: true, id: 9, mensaje: 'Firma guardada correctamente.' }) };
+      }
+      return { ok: true, status: 200, json: async () => ({ ok: true, firmas: [{ id: 9, tipo_mime: 'image/png', tamano_bytes: 120, creado_en: '2026-11-26' }] }) };
+    }
+  });
+  vm.runInContext(connectionSrc, firmaCtx);
+  const saved = await firmaCtx.RansaConnection.saveFirma('data:image/png;base64,iVBORw0KGgo=');
+  assert.equal(saved.id, 9);
+  assert.equal(requestedUrl, 'guardar_firma.php');
+  assert.equal(requestedMethod, 'POST');
+  const listed = await firmaCtx.RansaConnection.listFirmas();
+  assert.equal(listed.firmas.length, 1);
+  assert.equal(listed.firmas[0].id, 9);
 });
 
 test('CAPA DE FRONT / UI: RansaUI orquestación, puentes legacy y delegación', () => {
@@ -242,6 +298,16 @@ test('CAPA DE FRONT / UI: RansaUI orquestación, puentes legacy y delegación', 
   RansaUI.roles.save('M');
   assert.equal(fragmentLoadedUrl, 'roles_l.php');
   assert.deepEqual({ ...fragmentLoadedParams }, { op: 'M', codigo: '10', nombre: 'Auditor Contable' });
+
+  let deleteConfirmation = '';
+  RansaUI.confirm = message => {
+    deleteConfirmation = message;
+    return true;
+  };
+  RansaUI.roles.save('E');
+  assert.match(deleteConfirmation, /asignaciones de usuarios y aplicaciones/);
+  assert.equal(fragmentLoadedUrl, 'roles_l.php');
+  assert.deepEqual({ ...fragmentLoadedParams }, { op: 'E', codigo: '10', nombre: 'Auditor Contable' });
 });
 
 test('CAPA DE RESPUESTA: procesa respuestas declarativas del servidor', () => {
@@ -252,7 +318,8 @@ test('CAPA DE RESPUESTA: procesa respuestas declarativas del servidor', () => {
       'data-ransa-message': 'Guardado',
       'data-ransa-title': '',
       'data-ransa-reload': 'roles.php',
-      'data-ransa-params': '{}'
+      'data-ransa-params': '{}',
+      'data-ransa-refresh-sidebar': 'true'
     }[name] || null)
   };
   const container = {
@@ -260,13 +327,13 @@ test('CAPA DE RESPUESTA: procesa respuestas declarativas del servidor', () => {
     querySelectorAll: () => []
   };
   const notifications = [];
-  let reload = null;
+  const reloads = [];
 
   vm.runInContext(connectionSrc, ctx);
   vm.runInContext(logicSrc, ctx);
   vm.runInContext(uiSrc, ctx);
   ctx.RansaUI.notify = (...args) => notifications.push(args);
-  ctx.RansaConnection.loadFragment = (...args) => { reload = args; };
+  ctx.RansaConnection.loadFragment = (...args) => { reloads.push(args); };
   vm.runInContext(responseUiSrc, ctx);
 
   ctx.document.dispatchEvent(new ctx.CustomEvent('ransa:fragment-loaded', {
@@ -274,7 +341,11 @@ test('CAPA DE RESPUESTA: procesa respuestas declarativas del servidor', () => {
   }));
 
   assert.deepEqual(notifications, [['success', 'Guardado', '']]);
-  assert.equal(reload[0], 'roles.php');
-  assert.deepEqual({ ...reload[1] }, {});
-  assert.equal(reload[2], 'contenedor');
+  assert.equal(reloads[0][0], 'roles.php');
+  assert.deepEqual({ ...reloads[0][1] }, {});
+  assert.equal(reloads[0][2], 'contenedor');
+  assert.equal(reloads[1][0], 'contexto.php?fragment=sidebar');
+  assert.equal(reloads[1][2], 'sidebar-roles');
+  assert.equal(reloads[2][0], 'contexto.php?fragment=sidebar&mode=mobile');
+  assert.equal(reloads[2][2], 'mobile-sidebar-roles');
 });

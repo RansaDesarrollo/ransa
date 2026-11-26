@@ -40,6 +40,6 @@ if($op=='E')
 		
 }
 
-echo '<div data-ransa-server-response data-ransa-type="info" data-ransa-message="Asociación actualizada correctamente" data-ransa-reload="roles_aplicaciones.php" data-ransa-params="' . htmlspecialchars(json_encode(['rol' => (int) $cod_rol]), ENT_QUOTES, 'UTF-8') . '"></div>';
+echo '<div data-ransa-server-response data-ransa-type="info" data-ransa-message="Asociación actualizada correctamente" data-ransa-reload="roles_aplicaciones.php" data-ransa-params="' . htmlspecialchars(json_encode(['rol' => (int) $cod_rol]), ENT_QUOTES, 'UTF-8') . '" data-ransa-refresh-sidebar="true"></div>';
 
 ?>

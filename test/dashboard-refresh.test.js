@@ -65,3 +65,94 @@ test('repeated dashboard refresh releases old charts before replacing canvases',
     assert.ok(Chart.getChart(primary.canvas));
   }
 });
+
+test('account dropdown supports keyboard activation and updates aria-expanded', () => {
+  const classes = new Set();
+  const attributes = new Map();
+  const listeners = new Map();
+  const item = {
+    classList: {
+      add: name => classes.add(name),
+      remove: name => classes.delete(name),
+      toggle: name => classes.has(name) ? classes.delete(name) : classes.add(name),
+    },
+    closest: () => null,
+    addEventListener: (event, handler) => {
+      if (!listeners.has(event)) listeners.set(event, []);
+      listeners.get(event).push(handler);
+    },
+    setAttribute: (name, value) => attributes.set(name, value),
+    click: () => {
+      const event = { target: item, preventDefault() {}, stopPropagation() {} };
+      (listeners.get('click') || []).forEach(handler => handler(event));
+    },
+  };
+  const bodyListeners = new Map();
+  const body = {
+    addEventListener: (event, handler) => bodyListeners.set(event, handler),
+  };
+  const document = {
+    body,
+    getElementById: () => null,
+    querySelector: () => null,
+    querySelectorAll: selector => selector.includes('.js-item-menu') ? [item] : [],
+  };
+  const context = vm.createContext({
+    window: {},
+    document,
+    ready: () => {},
+    $: () => null,
+    $$: selector => document.querySelectorAll(selector),
+    on: (element, event, handler) => element.addEventListener(event, handler),
+    addClass: (element, name) => element.classList.add(name),
+    removeClass: (element, name) => element.classList.remove(name),
+  });
+
+  vm.runInContext(readFileSync(new URL('../js/main-vanilla.js', import.meta.url), 'utf8'), context);
+  vm.runInContext('initTopbarDropdowns()', context);
+
+  const keydown = listeners.get('keydown')[0];
+  keydown({ target: item, key: 'Enter', preventDefault() {} });
+  assert.equal(classes.has('show-dropdown'), true);
+  assert.equal(attributes.get('aria-expanded'), 'true');
+
+  bodyListeners.get('click')();
+  assert.equal(classes.has('show-dropdown'), false);
+  assert.equal(attributes.get('aria-expanded'), 'false');
+});
+
+test('sidebar submenu arrows handle clicks on refreshed menu items', () => {
+  const documentListeners = new Map();
+  const document = {
+    addEventListener: (event, handler) => documentListeners.set(event, handler),
+    getElementById: () => null,
+  };
+  const classes = new Set();
+  const arrow = {
+    classList: {
+      add: name => classes.add(name),
+      remove: name => classes.delete(name),
+      toggle: name => classes.has(name) ? classes.delete(name) : classes.add(name),
+    },
+    closest: selector => selector === '.js-arrow' ? arrow : null,
+    querySelector: () => null,
+    parentNode: { querySelector: () => null },
+  };
+  const context = vm.createContext({
+    window: {},
+    document,
+    ready: () => {},
+    on: (element, event, handler) => element.addEventListener(event, handler),
+    find: (element, selector) => element.querySelector(selector),
+    toggleClass: (element, name) => element.classList.toggle(name),
+  });
+
+  vm.runInContext(readFileSync(new URL('../js/main-vanilla.js', import.meta.url), 'utf8'), context);
+  vm.runInContext('initSubListArrows()', context);
+
+  let prevented = false;
+  documentListeners.get('click')({ target: arrow, preventDefault: () => { prevented = true; } });
+
+  assert.equal(prevented, true);
+  assert.equal(classes.has('open'), true);
+});
